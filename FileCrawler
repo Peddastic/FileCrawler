@@ -1,0 +1,155 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <dir.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+
+
+char createFile[1008]= "type NUL > ";
+
+char* func(char dirExt[], char safeDir[], char readDir[])
+{
+    int i, j;
+    char safeFile[1008] = "";
+    char createDir[1000] = "mkdir ";
+    char name[500] = {0};
+    char nameTmp[500] = {0};
+    char nextDirExt[1000] = {0};
+    char dir[1000] = "";
+    strcat(dir, readDir);
+    strcat(dir, dirExt);
+
+
+
+    DIR *dp;
+    struct dirent *ep;
+    char firstLetter;
+
+    if(dp = opendir (dir)){
+        //CREATE FOLDER
+            strcpy(nameTmp, "\"");
+            strcat(nameTmp, safeDir);
+            strcat(nameTmp, dirExt);
+            strcat(nameTmp, "\"");
+            strcat(createDir, nameTmp);
+        system(createDir);
+        while(ep = readdir (dp)){ //are the elements left in the directory?
+            strcpy(name,(ep->d_name));
+            firstLetter = name[0];
+
+            strcpy(nextDirExt, dirExt);
+            strcat(nextDirExt, name);
+            strcat(nextDirExt, "\\");
+            if(firstLetter!=46 && strcmp(name, "FileCrawler")){
+                func(nextDirExt, safeDir, readDir);
+            } else {
+
+            }
+        }
+    } else {
+        for(i=0;i<1000;i++){
+            if(!strcmp(&dir[i], "")){
+                break;
+            }
+        }
+        for(j=0;j<1000;j++){
+            if(!strcmp(&dirExt[j], "")){
+                break;
+            }
+        }
+        dir[i-1]=NULL;
+        dirExt[j-1]=NULL;
+        //CREATE FILE
+        strcat(safeFile, createFile);
+            strcpy(nameTmp, "\"");
+            strcat(nameTmp, safeDir);
+            strcat(nameTmp, dirExt);
+            strcat(nameTmp, "\"");
+            strcat(safeFile, nameTmp);
+        system(safeFile);
+    }
+
+
+    printf(".");
+    (void)closedir (dp);
+    return dir;
+}
+
+
+
+int main (void)
+{
+    //GET SAFEDIR
+    char safeDir[300]="";
+    // GET READDIR
+    char readDir[300]="";
+    char name[50]="";
+    char* returnResult;
+    int timeBefore = 0;
+    int timeAfter = 0;
+
+    printf("Which directory would you like to read?(e.g.: F:\\): ");
+    gets(readDir);
+
+
+    DIR *dp;
+    if(dp = opendir (readDir)){
+        printf("READ: %s\n", readDir);
+        (void)closedir (dp);
+    } else {
+        printf("WRONG INPUT: %s\n", readDir);
+        (void)closedir (dp);
+        system("pause");
+        system("cls");
+        main();
+        return 0;
+    }
+
+
+    printf("Where do you want to save the directory?(e.g.: C:\\Users\\): ");
+    gets(safeDir);
+
+    if(dp = opendir (safeDir)){
+        printf("DESTINATION: %s\n", safeDir);
+        (void)closedir (dp);
+    } else {
+        printf("WRONG INPUT: %s\n", safeDir);
+        (void)closedir (dp);
+        system("pause");
+        system("cls");
+        main();
+        return 0;
+    }
+
+
+
+    strcat(safeDir, "FileCrawler\\");
+    mkdir(safeDir);
+    printf("Enter a name for your directory?(e.g.: 1TB Drive): ");
+    gets(name);
+    strcat(safeDir, name);
+    strcat(safeDir, "\\");
+    printf("WRITE: %s\n", safeDir);
+    timeBefore = time(0);
+
+    if(dp = opendir (safeDir)){
+        char removeDir[30]="rd ";
+        strcat(removeDir, safeDir);
+        strcat(removeDir, " /S /Q");
+        system(removeDir);
+    }
+    (void)closedir (dp);
+    mkdir(safeDir);
+    returnResult = func("", safeDir, readDir);
+    timeAfter = time(0);
+    printf("\n\n----####  FINISH!!  ####----\n");
+
+    printf("Elapsed Time: %i seconds\n\n", ((timeAfter-timeBefore)));
+    system("pause");
+    return 0;
+}
+
