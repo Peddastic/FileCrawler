@@ -15,3 +15,7 @@ This way the source and destination directory have the same structure.
 This image of you e.g. hard drive can be saved on your internal drive,
 so you can keep track of the contents on your hard drive without conecting
 your hard drive to your system.
+
+Missing features:
+- speed improvements
+- add file / directory size to the file / directory name
